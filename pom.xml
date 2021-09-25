@@ -11,7 +11,7 @@
   <distributionManagement>
     <repository>
         <id>nexus</id>
-        <url>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/repository/</url>
+        <url>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/</url>
         <snapshots>        
           <enabled>true</enabled>
         </snapshots>
@@ -80,7 +80,7 @@
         </executions>
         <configuration>
             <serverId>nexus</serverId>
-            <nexusUrl>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/repository/</nexusUrl>
+            <nexusUrl>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/</nexusUrl>
             <skipStaging>true</skipStaging>
         </configuration>
       </plugin>
