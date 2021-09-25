@@ -3,7 +3,7 @@
     <localRepository/>
     <servers>
       <server>
-        <id>nexus</id>
+        <id>nexus-snapshots</id>
         <username>paulo</username>
         <password>admin123</password>
       </server>
