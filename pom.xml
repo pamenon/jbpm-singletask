@@ -8,15 +8,17 @@
   <packaging>kjar</packaging>
   <name>Single-UserTask</name>
   <description>Single user task sample</description>
-  <repositories>
-        <repository>
-            <id>nexus</id>
-            <url>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/</url>
-            <snapshots>        
-              <enabled>true</enabled>
-            </snapshots>
-        </repository>
-  </repositories>
+  <distributionManagement>  
+      <repositories>
+            <repository>
+                <id>nexus</id>
+                <url>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/</url>
+                <snapshots>        
+                  <enabled>true</enabled>
+                </snapshots>
+            </repository>
+      </repositories>
+  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.kie</groupId>
