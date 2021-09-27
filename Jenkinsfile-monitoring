@@ -26,7 +26,6 @@ pipeline {
                             openshift.withProject("${params.PROJECT_NAMESPACE}") {
                                 openshift.withCredentials("${rhpamsa}"){
                                     echo '# Checking if selector bc exist...'
-                                    echo $params.APP_NAME
                                     return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
                                 }
                             }
