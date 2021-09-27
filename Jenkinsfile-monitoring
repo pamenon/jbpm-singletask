@@ -20,15 +20,15 @@ pipeline {
        
        stage("Create Image Builder") {
 	      	steps {
-		       	when {
-		               expression {
-	                        openshift.withCluster() {
-	                        	openshift.withProject("${params.PROJECT_NAMESPACE}") {
-	                           		return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
-	                        	}
-	                     	}
-		                }
-		            }
+                    // when {
+                    //     expression {
+                    //             openshift.withCluster() {
+                    //                 openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                    //                     return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
 		         	script {
 		            	openshift.withCluster() {
 		                	openshift.withProject("${params.PROJECT_NAMESPACE}") {
@@ -56,15 +56,15 @@ pipeline {
    	 
    	 
     	stage("rhpam-monitor-deploy") {
-        	when {
-            	expression {
-                	openshift.withCluster() {
-                    	openshift.withProject("${params.PROJECT_NAMESPACE}") {
-                        	return !openshift.selector('dc', "${params.APP_NAME}-rhpamcentrmon").exists()
-                    	}
-                	}
-            	}
-        	}
+        	// when {
+            // 	expression {
+            //     	openshift.withCluster() {
+            //         	openshift.withProject("${params.PROJECT_NAMESPACE}") {
+            //             	return !openshift.selector('dc', "${params.APP_NAME}-rhpamcentrmon").exists()
+            //         	}
+            //     	}
+            // 	}
+        	// }
         	steps {
             	echo '### to do deploy steps ###'
             	script {
