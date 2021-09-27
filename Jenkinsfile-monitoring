@@ -5,9 +5,10 @@ pipeline {
     parameters {
         string(name: 'PROJECT_NAMESPACE', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
         string(name: 'APP_NAME', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
-        
+        credentials credentialType: 'com.openshift.jenkins.plugins.OpenShiftTokenCredentials', name: 'rhpamsa', defaultValue: '', description: '', required: true
     }
-     options {
+   
+    options {
         
         disableConcurrentBuilds()
        
@@ -22,8 +23,8 @@ pipeline {
 	      	  when {
                 expression {
                         openshift.withCluster() {
-                            openshift.withCredentials(){
-                                openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                            openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                                openshift.withCredentials("${rhpamsa}"){
                                     return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
                                 }
                             }
@@ -34,15 +35,15 @@ pipeline {
               steps {
                  	script {
 		            	openshift.withCluster() {
-                            openshift.withCredentials(){
                                     openshift.withProject("${params.PROJECT_NAMESPACE}") {
-                                    def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
-                                    def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${params.APP_NAME}", 
-                                    "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true",
-                                    "-p", "CREDENTIALS_SECRET=rhpam-credentials",
-                                    "-p", "KIE_SERVER_ROUTER_HTTPS_SECRET=kieserver-app-secret",
-                                    "-p", "BUSINESS_CENTRAL_HTTPS_SECRET=businesscentral-app-secret")
-                                    openshift.apply(bcmap2)
+                                        openshift.withCredentials("${rhpamsa}"){
+                                            def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
+                                            def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${params.APP_NAME}", 
+                                            "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true",
+                                            "-p", "CREDENTIALS_SECRET=rhpam-credentials",
+                                            "-p", "KIE_SERVER_ROUTER_HTTPS_SECRET=kieserver-app-secret",
+                                            "-p", "BUSINESS_CENTRAL_HTTPS_SECRET=businesscentral-app-secret")
+                                            openshift.apply(bcmap2)
                                     
                                     }
                                 }
@@ -56,12 +57,12 @@ pipeline {
            	echo '### Create Linux Container Image from package ###'
            	script {
                     openshift.withCluster() {
-                            openshift.withCredentials(){
-                                openshift.withProject("${params.PROJECT_NAMESPACE}") {
-                                    openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").startBuild("--follow","--wait=true","--build-loglevel=5")
+                        openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                            openshift.withCredentials("${rhpamsa}"){
+                                openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").startBuild("--follow","--wait=true","--build-loglevel=5")
                                 }
-                            }
-                    }
+                            }   
+                        }
             	}
         	}
     	}
@@ -70,9 +71,9 @@ pipeline {
     	stage("rhpam-monitor-deploy") {
         	when {
             	expression {
-                	openshift.withCluster() {
-                        openshift.withCredentials(){
+                	openshift.withCluster() {                     
                             openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                                openshift.withCredentials("${rhpamsa}"){
                                 return !openshift.selector('dc', "${params.APP_NAME}-rhpamcentrmon").exists()
                             }
                         }
@@ -83,8 +84,8 @@ pipeline {
             	echo '### to do deploy steps ###'
             	script {
                 	openshift.withCluster() {
-                        openshift.withCredentials(){
-                                    openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                        openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                            openshift.withCredentials("${rhpamsa}"){
                                     def app = openshift.newApp("${params.APP_NAME}-rhpamcentrmon:latest")
                                     app.narrow("svc").expose("--port=${env.PORT}");
                                     def dc = openshift.selector("dc", "${params.APP_NAME}-rhpamcentrmon")
