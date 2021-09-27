@@ -19,17 +19,17 @@ pipeline {
     stages {
        
        stage("Create Image Builder") {
-	      	steps {
-                    // when {
-                    //     expression {
-                    //             openshift.withCluster() {
-                    //                 openshift.withProject("${params.PROJECT_NAMESPACE}") {
-                    //                     return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
-                    //                 }
-                    //             }
-                    //         }
-                    //     }
-		         	script {
+	      	  when {
+                expression {
+                        openshift.withCluster() {
+                            openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                                return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
+                            }
+                        }
+                    }
+              }
+              steps {
+                 	script {
 		            	openshift.withCluster() {
 		                	openshift.withProject("${params.PROJECT_NAMESPACE}") {
 		                  	def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
