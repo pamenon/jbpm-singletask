@@ -3,15 +3,16 @@ pipeline {
 		label 'maven' 
 	}
     parameters {
-        string(name: 'PROJECT_NAMESPACE', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
-        string(name: 'APP_NAME', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
+        string(name: 'namespace', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
+        string(name: 'appName', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
+        
     }
      options {
-       
+        environment name: 'PROJECT_NAMESPACE', value: 'namespace'
+        environment name: 'APP_NAME', value: 'appName'
         disableConcurrentBuilds()
        
         timeout(time: 15, unit: 'MINUTES')
-     
     }
     stages {
        
