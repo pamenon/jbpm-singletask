@@ -3,16 +3,18 @@ pipeline {
 		label 'maven' 
 	}
     parameters {
-        string(name: 'namespace', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
-        string(name: 'appName', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
+        string(name: 'PROJECT_NAMESPACE', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
+        string(name: 'APP_NAME', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
         
     }
      options {
-        environment name: 'PROJECT_NAMESPACE', value: 'namespace'
-        environment name: 'APP_NAME', value: 'appName'
+        
         disableConcurrentBuilds()
        
         timeout(time: 15, unit: 'MINUTES')
+    }
+    environment {
+        PORT = 8080;
     }
     stages {
        
@@ -21,17 +23,17 @@ pipeline {
 		       	when {
 		               expression {
 	                        openshift.withCluster() {
-	                        	openshift.withProject("${PROJECT_NAMESPACE}") {
-	                           		return !openshift.selector("bc", "${APP_NAME}-rhpamcentrmon").exists();
+	                        	openshift.withProject("${params.PROJECT_NAMESPACE}") {
+	                           		return !openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").exists();
 	                        	}
 	                     	}
 		                }
 		            }
 		         	script {
 		            	openshift.withCluster() {
-		                	openshift.withProject("${PROJECT_NAMESPACE}") {
+		                	openshift.withProject("${params.PROJECT_NAMESPACE}") {
 		                  	def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
-		                  	def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${APP_NAME}", "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true")
+		                  	def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${params.APP_NAME}", "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true")
 		                  	openshift.apply(bcmap2)
 		                 	 
 		                	}
@@ -44,8 +46,8 @@ pipeline {
            	echo '### Create Linux Container Image from package ###'
            	script {
               	openshift.withCluster() {
-                  	openshift.withProject("${PROJECT_NAMESPACE}") {
-                      	openshift.selector("bc", "${APP_NAME}-rhpamcentrmon").startBuild("--follow","--wait=true","--build-loglevel=5")
+                  	openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                      	openshift.selector("bc", "${params.APP_NAME}-rhpamcentrmon").startBuild("--follow","--wait=true","--build-loglevel=5")
                   	}
               	}
             	}
@@ -57,8 +59,8 @@ pipeline {
         	when {
             	expression {
                 	openshift.withCluster() {
-                    	openshift.withProject("${PROJECT_NAMESPACE}") {
-                        	return !openshift.selector('dc', "${APP_NAME}-rhpamcentrmon").exists()
+                    	openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                        	return !openshift.selector('dc', "${params.APP_NAME}-rhpamcentrmon").exists()
                     	}
                 	}
             	}
@@ -67,10 +69,10 @@ pipeline {
             	echo '### to do deploy steps ###'
             	script {
                 	openshift.withCluster() {
-                    	openshift.withProject("${PROJECT_NAMESPACE}") {
-                        	def app = openshift.newApp("${APP_NAME}-rhpamcentrmon:latest")
-                        	app.narrow("svc").expose("--port=${PORT}");
-                        	def dc = openshift.selector("dc", "${APP_NAME}-rhpamcentrmon")
+                    	openshift.withProject("${params.PROJECT_NAMESPACE}") {
+                        	def app = openshift.newApp("${params.APP_NAME}-rhpamcentrmon:latest")
+                        	app.narrow("svc").expose("--port=${env.PORT}");
+                        	def dc = openshift.selector("dc", "${params.APP_NAME}-rhpamcentrmon")
                         	dc.rollout().status("--watch=true")
                       		 dc.related('pods').logs()
                         	while (dc.object().spec.replicas != dc.object().status.availableReplicas) {
@@ -83,7 +85,7 @@ pipeline {
     	}
     	stage ('Verify Service') {
             steps {
-                openshiftVerifyService(svcName: "${APP_NAME}-rhpamcentrmon", verbose: 'true')
+                openshiftVerifyService(svcName: "${params.APP_NAME}-rhpamcentrmon", verbose: 'true')
             }
     	}
     }
