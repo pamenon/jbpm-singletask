@@ -3,7 +3,8 @@ pipeline {
 		label 'maven' 
 	}
     parameters {
-        string(name: 'Namespace', defaultValue: '', description: 'Your Paas project name:')
+        string(name: 'PROJECT_NAMESPACE', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
+        string(name: 'APP_NAME', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
     }
      options {
        
@@ -13,11 +14,76 @@ pipeline {
      
     }
     stages {
-        stage('build') {
-            steps {
-                sh 'mvn --version'
-            }
-        }
        
+       stage("Create Image Builder") {
+	      	steps {
+		       	when {
+		               expression {
+	                        openshift.withCluster() {
+	                        	openshift.withProject("${PROJECT_NAMESPACE}") {
+	                           		return !openshift.selector("bc", "${APP_NAME}-rhpamcentrmon").exists();
+	                        	}
+	                     	}
+		                }
+		            }
+		         	script {
+		            	openshift.withCluster() {
+		                	openshift.withProject("${PROJECT_NAMESPACE}") {
+		                  	def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
+		                  	def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${APP_NAME}", "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true")
+		                  	openshift.apply(bcmap2)
+		                 	 
+		                	}
+		            	}
+		         	}
+	      	}
+    	}
+    	stage("rhpam-monitor-build") {
+        	steps {
+           	echo '### Create Linux Container Image from package ###'
+           	script {
+              	openshift.withCluster() {
+                  	openshift.withProject("${PROJECT_NAMESPACE}") {
+                      	openshift.selector("bc", "${APP_NAME}-rhpamcentrmon").startBuild("--follow","--wait=true","--build-loglevel=5")
+                  	}
+              	}
+            	}
+        	}
+    	}
+   	 
+   	 
+    	stage("rhpam-monitor-deploy") {
+        	when {
+            	expression {
+                	openshift.withCluster() {
+                    	openshift.withProject("${PROJECT_NAMESPACE}") {
+                        	return !openshift.selector('dc', "${APP_NAME}-rhpamcentrmon").exists()
+                    	}
+                	}
+            	}
+        	}
+        	steps {
+            	echo '### to do deploy steps ###'
+            	script {
+                	openshift.withCluster() {
+                    	openshift.withProject("${PROJECT_NAMESPACE}") {
+                        	def app = openshift.newApp("${APP_NAME}-rhpamcentrmon:latest")
+                        	app.narrow("svc").expose("--port=${PORT}");
+                        	def dc = openshift.selector("dc", "${APP_NAME}-rhpamcentrmon")
+                        	dc.rollout().status("--watch=true")
+                      		 dc.related('pods').logs()
+                        	while (dc.object().spec.replicas != dc.object().status.availableReplicas) {
+                            	sleep 10
+                        	}
+                    	}
+                	}
+            	}
+        	}
+    	}
+    	stage ('Verify Service') {
+            steps {
+                openshiftVerifyService(svcName: "${APP_NAME}-rhpamcentrmon", verbose: 'true')
+            }
+    	}
     }
 }
