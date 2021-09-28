@@ -71,8 +71,7 @@ pipeline {
                         }
             	}
         	}
-    	}
-   	 
+    	}   	 
    	 
     	stage("rhpam-monitor-deploy") {
         	when {
