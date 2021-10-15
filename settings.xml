@@ -4,8 +4,8 @@
     <servers>
       <server>
         <id>nexus-snapshots</id>
-        <username>paulo</username>
-        <password>admin123</password>
+        <username>admin</username>
+        <password>password123</password>
       </server>
     </servers>
     <profiles>
