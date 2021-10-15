@@ -86,7 +86,7 @@
         </executions>
         <configuration>
             <serverId>nexus</serverId>
-            <nexusUrl>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/</nexusUrl>
+            <nexusUrl>http://nexus-rhpam-cicd.apps.cluster-1816.1816.sandbox650.opentlc.com/</nexusUrl>
             <skipStaging>true</skipStaging>
         </configuration>
       </plugin>
