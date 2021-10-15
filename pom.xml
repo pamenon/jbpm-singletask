@@ -20,7 +20,7 @@
 -->
     <snapshotRepository>
       <id>nexus-snapshots</id>
-      <url>http://nexus-cicd-pam.apps.cluster-61fe.61fe.sandbox1256.opentlc.com/repository/maven-snapshots/</url>
+      <url>http://nexus-rhpam-cicd.apps.cluster-1816.1816.sandbox650.opentlc.com/repository/maven-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencies>
