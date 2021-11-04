@@ -548,18 +548,18 @@ objects:
                   path: /rest/healthy
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 180
-                timeoutSeconds: 2
-                periodSeconds: 15
+                initialDelaySeconds: 300
+                timeoutSeconds: 120
+                periodSeconds: 180
                 failureThreshold: 36
               readinessProbe:
                 httpGet:
                   path: /rest/ready
                   port: 8080
                   scheme: HTTP
-                initialDelaySeconds: 60
-                timeoutSeconds: 2
-                periodSeconds: 5
+                initialDelaySeconds: 180
+                timeoutSeconds: 120
+                periodSeconds: 180
                 failureThreshold: 36
               ports:
                 - name: jolokia
