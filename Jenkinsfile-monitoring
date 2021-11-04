@@ -38,14 +38,23 @@ pipeline {
 		            	openshift.withCluster() {
                                     openshift.withProject("${params.PROJECT_NAMESPACE}") {
                                         openshift.withCredentials("${rhpamsa}"){
-                                            echo "Using project: ${openshift.project()}"
-                                            def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
+                                         /*   def bcmap = readYaml file: 'openshift/templates/rhpam711-prod-immutable-monitor.yaml';
                                             def bcmap2 = openshift.process(bcmap, "-p", "APPLICATION_NAME=${params.APP_NAME}", 
                                             "-p", "KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true",
                                             "-p", "CREDENTIALS_SECRET=rhpam-credentials",
                                             "-p", "KIE_SERVER_ROUTER_HTTPS_SECRET=kieserver-app-secret",
                                             "-p", "BUSINESS_CENTRAL_HTTPS_SECRET=businesscentral-app-secret")
+                                            openshift.apply(bcmap2)
                                             openshift.newApp(bcmap2)
+                                        */
+                                        sh '''
+                                            oc new-app -f openshift/templates/rhpam711-prod-immutable-monitor.yaml \
+                                            -p APPLICATION_NAME=${params.APP_NAME} \
+                                            -p KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true \
+                                            -p CREDENTIALS_SECRET=rhpam-credentials \
+                                            -p KIE_SERVER_ROUTER_HTTPS_SECRET=kieserver-app-secret \
+                                            -p BUSINESS_CENTRAL_HTTPS_SECRET=businesscentral-app-secret
+                                        '''
                                     
                                     }
                                 }
