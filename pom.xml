@@ -20,7 +20,7 @@
 -->
     <snapshotRepository>
       <id>nexus-snapshots</id>
-      <url>http://nexus-rhpam-cicd.apps.cluster-1816.1816.sandbox650.opentlc.com/repository/maven-snapshots/</url>
+      <url>http://nexus-openshift-operators.apps.cluster-7d1e.7d1e.sandbox425.opentlc.com/repository/maven-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
   <dependencies>
@@ -86,7 +86,7 @@
         </executions>
         <configuration>
             <serverId>nexus</serverId>
-            <nexusUrl>http://nexus-rhpam-cicd.apps.cluster-1816.1816.sandbox650.opentlc.com/</nexusUrl>
+            <nexusUrl>http://nexus-openshift-operators.apps.cluster-7d1e.7d1e.sandbox425.opentlc.com/</nexusUrl>
             <skipStaging>true</skipStaging>
         </configuration>
       </plugin>
