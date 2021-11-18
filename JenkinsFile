@@ -8,11 +8,10 @@ pipeline {
         credentials credentialType: 'com.openshift.jenkins.plugins.OpenShiftTokenCredentials', name: 'rhpamsa', defaultValue: '', description: '', required: true
     }
    
-    options {
-        
-        disableConcurrentBuilds()
-       
-        timeout(time: 15, unit: 'MINUTES')
+   options {
+           skipDefaultCheckout()
+           disableConcurrentBuilds()
+           timeout(time: 30, unit: 'MINUTES')
     }
     environment {
         PORT = 8080;
