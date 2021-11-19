@@ -2,18 +2,19 @@ pipeline {
     agent { 
 		label 'maven' 
 	}
+    // environment {
+    //     //Global Vars
+    //     PROJECT_NAMESPACE = "cicd-pam"
+    //     APP_NAME = "pam-monitor"
+    // }
+   
     parameters {
         string(name: 'PROJECT_NAMESPACE', defaultValue: '', description: 'Your Paas(Openshift namespace) project name:')
         string(name: 'APP_NAME', defaultValue: '', description: 'Your App monitoring name: e.i: my-app')
         credentials credentialType: 'com.openshift.jenkins.plugins.OpenShiftTokenCredentials', name: 'rhpamsa', defaultValue: '', description: '', required: true
     }
 
-  environment {
-        //Global Vars
-        PROJECT_NAMESPACE = "cicd-pam"
-        APP_NAME = "pam-monitor"
-    }
-   
+  
     options {
            skipDefaultCheckout()
            disableConcurrentBuilds()
