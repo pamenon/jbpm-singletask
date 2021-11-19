@@ -24,7 +24,13 @@ pipeline {
         PORT = 8080;
     }
     stages {
-       
+        
+        stage('Checkout branch') {
+            steps {
+                checkout scm
+            }
+        }
+
        stage("Create New App") {
 	      	  when {
                 expression {
