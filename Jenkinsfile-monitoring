@@ -48,7 +48,7 @@ pipeline {
                                         */
                                         sh '''
                                             oc new-app -f openshift/templates/rhpam711-prod-immutable-monitor.yaml \
-                                            -p APPLICATION_NAME=${params.APP_NAME} \
+                                            -p APPLICATION_NAME="${params.APP_NAME}" \
                                             -p KIE_SERVER_CONTROLLER_OPENSHIFT_GLOBAL_DISCOVERY_ENABLED=true \
                                             -p CREDENTIALS_SECRET=rhpam-credentials \
                                             -p KIE_SERVER_ROUTER_HTTPS_SECRET=kieserver-app-secret \
