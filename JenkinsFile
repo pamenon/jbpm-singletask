@@ -52,7 +52,7 @@ pipeline {
                                            sh '''
                                                 oc new-app -f openshift/templates/rhpam711-kieserver-postgresql.yaml \
                                                 -p KIE_SERVER_HTTPS_SECRET=kieserver-app-secret \
-                                                -p APPLICATION_NAME=${params.APP_NAME} \
+                                                -p APPLICATION_NAME=${APP_NAME} \
                                                 -p CREDENTIALS_SECRET=rhpam-credentials \
                                                 -p KIE_SERVER_CONTAINER_DEPLOYMENT=Single-UserTask-1.0.0-SNAPSHOT=com.single-usertask:Single-UserTask:1.0.0-SNAPSHOT \
                                                 -p IMAGE_STREAM_NAMESPACE=openshift \
